@@ -1,108 +1,125 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>Império Gás - Atendimento</title>
-<style>
-body { font-family: 'Segoe UI', sans-serif; background:#f0f2f5; margin:0; padding:0; }
-h2 { text-align:center; margin:20px 0; color:#222; }
-#chat { max-width:500px; margin:20px auto; background:#fff; padding:20px; border-radius:15px; box-shadow:0 8px 20px rgba(0,0,0,0.15); height:400px; overflow-y:auto; display:flex; flex-direction:column; }
-.msg { margin:10px 0; padding:12px 15px; border-radius:12px; max-width:80%; word-wrap:break-word; font-size:14px; }
-.bot { background:#e0f7e0; align-self:flex-start; }
-.user { background:#cce5ff; align-self:flex-end; }
-#inputArea { max-width:500px; margin:0 auto; display:flex; gap:10px; padding-bottom:20px; }
-input#input { flex:1; padding:12px; border-radius:8px; border:1px solid #ccc; font-size:14px; }
-button { padding:12px 20px; border-radius:8px; border:none; background:#28a745; color:white; cursor:pointer; transition:0.3s; }
-button:hover { background:#218838; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atendimento Gás</title>
+  <style>
+    /* Tela central tipo app */
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background: #f0f0f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .app-container {
+      width: 360px; /* largura de um celular */
+      height: 640px; /* altura de um celular */
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    header {
+      background: #0066ff;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 1.2em;
+      font-weight: bold;
+    }
+
+    .chat {
+      flex: 1;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      gap: 10px;
+    }
+
+    .message {
+      padding: 10px;
+      border-radius: 10px;
+      max-width: 70%;
+    }
+
+    .message.client {
+      background: #0066ff;
+      color: white;
+      align-self: flex-end;
+    }
+
+    .message.bot {
+      background: #e0e0e0;
+      color: black;
+      align-self: flex-start;
+    }
+
+    .input-area {
+      display: flex;
+      border-top: 1px solid #ccc;
+    }
+
+    .input-area input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      outline: none;
+      font-size: 1em;
+    }
+
+    .input-area button {
+      background: #0066ff;
+      color: white;
+      border: none;
+      padding: 0 15px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+  </style>
 </head>
 <body>
+  <div class="app-container">
+    <header>Império Gás</header>
+    <div class="chat" id="chat">
+      <div class="message bot">Olá! Quer comprar o gás P13?</div>
+    </div>
+    <div class="input-area">
+      <input type="text" id="userInput" placeholder="Digite sua mensagem...">
+      <button onclick="sendMessage()">Enviar</button>
+    </div>
+  </div>
 
-<h2>Império Gás - Atendimento Online</h2>
+  <script>
+    function sendMessage() {
+      const input = document.getElementById('userInput');
+      const chat = document.getElementById('chat');
 
-<div id="chat">
-  <div class="msg bot">Olá! Bem-vindo ao Império Gás. Qual é o seu nome?</div>
-</div>
+      if (input.value.trim() === '') return;
 
-<div id="inputArea">
-    <input type="text" id="input" placeholder="Digite aqui...">
-    <button onclick="sendMessage()">Enviar</button>
-</div>
+      // mensagem do cliente
+      const userMsg = document.createElement('div');
+      userMsg.classList.add('message', 'client');
+      userMsg.textContent = input.value;
+      chat.appendChild(userMsg);
 
-<script>
-let step=0;
-let clientName="";
-const product="Gás P13";
-const price=120;
+      // resposta automática
+      const botMsg = document.createElement('div');
+      botMsg.classList.add('message', 'bot');
+      botMsg.textContent = 'Pedido recebido: ' + input.value;
+      chat.appendChild(botMsg);
 
-function sendMessage(){
-    const input=document.getElementById('input');
-    const chat=document.getElementById('chat');
-    const text=input.value.trim();
-    if(!text) return;
-
-    const userMsg=document.createElement('div');
-    userMsg.className='msg user';
-    userMsg.textContent=text;
-    chat.appendChild(userMsg);
-    input.value="";
-
-    setTimeout(()=>{
-        const botMsg=document.createElement('div');
-        botMsg.className='msg bot';
-
-        if(step===0){
-            clientName=text;
-            botMsg.textContent=`Olá, ${clientName}! Temos disponível apenas o ${product}.`;
-            step++;
-        } else if(step===1){
-            botMsg.innerHTML=`O preço é R$${price}. Deseja confirmar o pedido? (Sim/Não)`;
-            step++;
-        } else if(step===2){
-            if(text.toLowerCase()==="sim"){
-                botMsg.innerHTML=`Pedido confirmado! Escolha o método de pagamento:<br>
-                <button onclick="payPix()">Pix</button> <button onclick="payCard()">Cartão</button>`;
-            } else{
-                botMsg.textContent=`Pedido cancelado. Atualize a página para tentar novamente.`;
-            }
-            step++;
-        } else{
-            botMsg.textContent=`Se quiser fazer outro pedido, atualize a página.`;
-        }
-
-        chat.appendChild(botMsg);
-        chat.scrollTop=chat.scrollHeight;
-    },500);
-}
-
-/* ===== Pagamento ===== */
-function saveOrder(order){
-    let pedidos=localStorage.getItem('pedidos');
-    pedidos=pedidos?JSON.parse(pedidos):[];
-    pedidos.push(order);
-    localStorage.setItem('pedidos',JSON.stringify(pedidos));
-}
-
-function payPix(){
-    const chat=document.getElementById('chat');
-    const botMsg=document.createElement('div');
-    botMsg.className='msg bot';
-    botMsg.innerHTML=`Pagamento via Pix selecionado!<br>Chave Pix: <b>12345678900</b><br>Obrigado pelo pedido!`;
-    chat.appendChild(botMsg);
-    saveOrder({nome:clientName,produto:product,preco:price,pagamento:"Pix",entregue:false,data:new Date().toLocaleString()});
-    chat.scrollTop=chat.scrollHeight;
-}
-
-function payCard(){
-    const chat=document.getElementById('chat');
-    const botMsg=document.createElement('div');
-    botMsg.className='msg bot';
-    botMsg.innerHTML=`Pagamento via Cartão selecionado!<br>Pedido confirmado! Obrigado!`;
-    chat.appendChild(botMsg);
-    saveOrder({nome:clientName,produto:product,preco:price,pagamento:"Cartão",entregue:false,data:new Date().toLocaleString()});
-    chat.scrollTop=chat.scrollHeight;
-}
-</script>
-
+      input.value = '';
+      chat.scrollTop = chat.scrollHeight;
+    }
+  </script>
 </body>
 </html>
