@@ -2,104 +2,67 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Império Gás - Painel</title>
+<title>Painel ADM - Império Gás</title>
 <style>
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f5f5f5;
+body { font-family:Arial; background:#f4f4f4; padding:20px; }
+.card {
+  background:#fff;
+  padding:12px;
+  margin:10px 0;
+  border-radius:8px;
 }
-header {
-    background-color: #2c7a7b;
-    color: #fff;
-    text-align: center;
-    padding: 15px;
-    font-size: 22px;
-    font-weight: bold;
+button {
+  padding:8px;
+  background:#28a745;
+  color:white;
+  border:none;
+  border-radius:5px;
 }
-.container {
-    padding: 20px;
-    max-width: 800px;
-    margin: auto;
-}
-button.add-order {
-    margin-top: 10px;
-    padding: 10px 20px;
-    background-color: #2c7a7b;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-}
-button.add-order:hover {
-    background-color: #276767;
-}
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-}
-table, th, td {
-    border: 1px solid #ccc;
-}
-th, td {
-    padding: 12px;
-    text-align: left;
-}
-th {
-    background-color: #2c7a7b;
-    color: white;
-}
-.status {
-    padding: 5px 10px;
-    border-radius: 8px;
-    color: white;
-    font-weight: bold;
-}
-.pendente { background-color: #f59e0b; }
-.entregue { background-color: #10b981; }
 </style>
 </head>
 <body>
 
-<header>Painel Administrativo - Império Gás</header>
-<div class="container">
-    <button class="add-order" onclick="addFakeOrder()">Adicionar Pedido de Teste</button>
-    <table id="orders-table">
-        <thead>
-            <tr>
-                <th>Cliente</th>
-                <th>Produto</th>
-                <th>Pagamento</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
+<h2>🔐 Painel ADM</h2>
+
+<input type="password" id="senha" placeholder="Senha">
+<button onclick="login()">Entrar</button>
+
+<div id="painel" style="display:none;">
+  <h3>📦 Pedidos</h3>
+  <div id="lista"></div>
 </div>
 
 <script>
-const ordersTable = document.getElementById('orders-table').querySelector('tbody');
+const SENHA = "147985";
 
-function addOrder(cliente, produto, pagamento, status){
-    const row = document.createElement('tr');
-    row.innerHTML = `
-        <td>${cliente}</td>
-        <td>${produto}</td>
-        <td>${pagamento}</td>
-        <td><span class="status ${status === 'Pendente' ? 'pendente' : 'entregue'}">${status}</span></td>
-    `;
-    ordersTable.appendChild(row);
+function login(){
+  if(document.getElementById("senha").value === SENHA){
+    document.getElementById("painel").style.display = "block";
+    load();
+  } else {
+    alert("Senha incorreta");
+  }
 }
 
-function addFakeOrder(){
-    const names = ['João', 'Maria', 'Carlos', 'Ana'];
-    const cliente = names[Math.floor(Math.random()*names.length)];
-    addOrder(cliente, 'Gás P13', 'Pix', 'Pendente');
+function load(){
+  const lista = document.getElementById("lista");
+  const pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+  lista.innerHTML = "";
+
+  pedidos.forEach(p => {
+    lista.innerHTML += `
+      <div class="card">
+        <b>Data:</b> ${p.data}<br>
+        <b>Precisão:</b> ${Math.round(p.acc)} m<br>
+        <a target="_blank"
+          href="https://www.google.com/maps?q=${p.lat},${p.lon}">
+          📍 Ver no Google Maps
+        </a>
+      </div>
+    `;
+  });
 }
 </script>
+
 </body>
 </html>
