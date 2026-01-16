@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Império Gás - Painel de Entrega</title>
+<style>
+body { font-family:'Segoe UI', sans-serif; background:#f0f2f5; margin:0; padding:0; }
+h2, h3 { text-align:center; margin:20px 0; color:#222; }
+#painel { max-width:700px; margin:20px auto; background:#fff; padding:20px; border-radius:15px; box-shadow:0 8px 20px rgba(0,0,0,0.15); }
+table { width:100%; border-collapse:collapse; }
+th, td { padding:12px; text-align:center; border-bottom:1px solid #ddd; }
+th { background:#28a745; color:white; }
+tr:hover { background:#f2f2f2; }
+.entregue { background:#d1f7d1 !important; }
+button { padding:8px 15px; border:none; border-radius:8px; background:#007bff; color:white; cursor:pointer; transition:0.3s; }
+button:hover { background:#0056b3; }
+</style>
+</head>
+<body>
+
+<h2>Painel de Entrega - Funcionários</h2>
+
+<div id="painel">
+  <table id="ordersTable">
+    <tr>
+      <th>Nome</th>
+      <th>Produto</th>
+      <th>Preço</th>
+      <th>Pagamento</th>
+      <th>Data</th>
+      <th>Status</th>
+    </tr>
+  </table>
+  <button onclick="updatePanel()">Atualizar</button>
+</div>
+
+<script>
+function updatePanel(){
+    const table=document.getElementById('ordersTable');
+    table.innerHTML=`
+    <tr>
+      <th>Nome</th>
+      <th>Produto</th>
+      <th>Preço</th>
+      <th>Pagamento</th>
+      <th>Data</th>
+      <th>Status</th>
+    </tr>`;
+    const pedidos=localStorage.getItem('pedidos');
+    const orders=pedidos?JSON.parse(pedidos):[];
+    orders.forEach((p,i)=>{
+        const row=table.insertRow();
+        row.insertCell(0).textContent=p.nome;
+        row.insertCell(1).textContent=p.produto;
+        row.insertCell(2).textContent=`R$${p.preco}`;
+        row.insertCell(3).textContent=p.pagamento;
+        row.insertCell(4).textContent=p.data;
+        const statusCell=row.insertCell(5);
+        statusCell.textContent=p.entregue?'Entregue':'Pendente';
+        if(p.entregue) row.classList.add('entregue');
+        statusCell.style.cursor='pointer';
+        statusCell.onclick=()=>{
+            orders[i].entregue=!orders[i].entregue;
+            localStorage.setItem('pedidos',JSON.stringify(orders));
+            updatePanel();
+        };
+    });
+}
+
+// Atualiza painel ao abrir
+updatePanel();
+</script>
+
+</body>
+</html>
