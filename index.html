@@ -5,197 +5,135 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Império Gás - Atendimento</title>
 <style>
-/* === Tela tipo celular === */
+/* Corpo da página */
 body {
-  margin: 0;
-  font-family: 'Arial', sans-serif;
-  background: #f0f0f0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
-.app-container {
-  width: 360px;
-  height: 640px;
-  background: #fff;
-  border-radius: 20px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+/* Caixa de chat */
+.chat-container {
+    width: 100%;
+    max-width: 480px;
+    height: 90vh;
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
 }
 
-header {
-  background: #0066ff;
-  color: white;
-  padding: 15px;
-  text-align: center;
-  font-size: 1.2em;
-  font-weight: bold;
+/* Título */
+.chat-container h2 {
+    text-align: center;
+    margin: 0 0 10px 0;
 }
 
-/* === Chat === */
-.chat {
-  flex: 1;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  gap: 10px;
+/* Área de mensagens */
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    padding-right: 5px;
 }
 
+/* Mensagens */
 .message {
-  padding: 10px;
-  border-radius: 10px;
-  max-width: 70%;
+    padding: 8px 12px;
+    border-radius: 10px;
+    margin-bottom: 5px;
+    max-width: 80%;
+    word-wrap: break-word;
 }
 
-.message.client {
-  background: #0066ff;
-  color: white;
-  align-self: flex-end;
+/* Mensagens do bot */
+.bot {
+    background-color: #d4f7d4;
+    align-self: flex-start;
 }
 
-.message.bot {
-  background: #e0e0e0;
-  color: black;
-  align-self: flex-start;
+/* Mensagens do usuário */
+.user {
+    background-color: #cce0ff;
+    align-self: flex-end;
 }
 
-/* === Input === */
-.input-area {
-  display: flex;
-  border-top: 1px solid #ccc;
+/* Input e botão */
+.chat-input {
+    display: flex;
+    gap: 5px;
 }
 
-.input-area input {
-  flex: 1;
-  padding: 10px;
-  border: none;
-  outline: none;
-  font-size: 1em;
+.chat-input input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
 }
 
-.input-area button {
-  background: #0066ff;
-  color: white;
-  border: none;
-  padding: 0 15px;
-  cursor: pointer;
-  font-size: 1em;
-}
-
-/* === Painel de Funcionário === */
-#painel-func {
-  display: none;
-  flex-direction: column;
-  padding: 10px;
-  background: #f9f9f9;
-  height: 100%;
-  overflow-y: auto;
-}
-
-#painel-func h2 {
-  text-align: center;
-  margin: 0 0 10px 0;
-}
-
-.pedido {
-  padding: 10px;
-  background: #e0e0e0;
-  border-radius: 10px;
-  margin-bottom: 5px;
+.chat-input button {
+    padding: 10px 15px;
+    border: none;
+    background-color: #28a745;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
 }
 </style>
 </head>
 <body>
 
-<div class="app-container" id="app">
-  <header>Império Gás</header>
-
-  <!-- Chat -->
-  <div class="chat" id="chat">
-    <div class="message bot">Olá! Quer comprar o gás P13? Preço: R$120. Pagamento via Pix.</div>
-  </div>
-
-  <!-- Input -->
-  <div class="input-area">
-    <input type="text" id="userInput" placeholder="Digite sua mensagem...">
-    <button onclick="sendMessage()">Enviar</button>
-    <button onclick="abrirPainel()" style="background:#28a745;">Painel</button>
-  </div>
-
-  <!-- Painel do Funcionário -->
-  <div id="painel-func">
-    <h2>Pedidos Recebidos</h2>
-    <div id="pedidos"></div>
-    <button onclick="fecharPainel()" style="margin-top:10px;background:#ff4d4d;color:white;">Fechar Painel</button>
-  </div>
+<div class="chat-container">
+    <h2>Império Gás - Atendimento Online</h2>
+    <div class="chat-messages" id="chatMessages">
+        <div class="message bot">Olá! Bem-vindo ao Império Gás. Qual é o seu nome?</div>
+    </div>
+    <div class="chat-input">
+        <input type="text" id="userInput" placeholder="Digite aqui...">
+        <button onclick="sendMessage()">Enviar</button>
+    </div>
 </div>
 
 <script>
-const chat = document.getElementById('chat');
-const input = document.getElementById('userInput');
-const pedidosDiv = document.getElementById('pedidos');
-const painel = document.getElementById('painel-func');
-const app = document.getElementById('app');
-
-let pedidos = [];
+const chatMessages = document.getElementById('chatMessages');
+const userInput = document.getElementById('userInput');
 
 function sendMessage() {
-  if(input.value.trim() === '') return;
+    const text = userInput.value.trim();
+    if (!text) return;
 
-  // Mensagem do cliente
-  const userMsg = document.createElement('div');
-  userMsg.classList.add('message','client');
-  userMsg.textContent = input.value;
-  chat.appendChild(userMsg);
+    // Mostra a mensagem do usuário
+    const userMessage = document.createElement('div');
+    userMessage.classList.add('message', 'user');
+    userMessage.textContent = text;
+    chatMessages.appendChild(userMessage);
 
-  // Resposta automática
-  const botMsg = document.createElement('div');
-  botMsg.classList.add('message','bot');
-  botMsg.innerHTML = `Pedido recebido: ${input.value} <br> <button onclick="pagamentoPix('${input.value}')">Pagar Pix</button>`;
-  chat.appendChild(botMsg);
+    userInput.value = '';
+    chatMessages.scrollTop = chatMessages.scrollHeight;
 
-  // Salva no painel
-  pedidos.push(input.value);
-  atualizarPainel();
+    // Resposta automática simples
+    setTimeout(() => {
+        const botMessage = document.createElement('div');
+        botMessage.classList.add('message', 'bot');
 
-  input.value = '';
-  chat.scrollTop = chat.scrollHeight;
-}
+        if(text.toLowerCase().includes('nome')){
+            botMessage.textContent = `Prazer em te atender, ${text}! Nosso gás disponível é o P13. O pagamento é via PIX.`;
+        } else {
+            botMessage.textContent = "Nosso gás disponível é o P13. Pagamento somente via PIX. Qual endereço para entrega?";
+        }
 
-// Simula pagamento Pix
-function pagamentoPix(pedido) {
-  alert(`Link de pagamento Pix para: ${pedido} \nValor: R$120`);
-}
-
-// Atualiza o painel do funcionário
-function atualizarPainel() {
-  pedidosDiv.innerHTML = '';
-  pedidos.forEach((p, i) => {
-    const div = document.createElement('div');
-    div.classList.add('pedido');
-    div.textContent = `${i+1}. ${p}`;
-    pedidosDiv.appendChild(div);
-  });
-}
-
-// Abre painel
-function abrirPainel() {
-  chat.style.display = 'none';
-  input.parentElement.style.display = 'none';
-  painel.style.display = 'flex';
-}
-
-// Fecha painel
-function fecharPainel() {
-  chat.style.display = 'flex';
-  input.parentElement.style.display = 'flex';
-  painel.style.display = 'none';
+        chatMessages.appendChild(botMessage);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }, 800);
 }
 </script>
+
 </body>
 </html>
