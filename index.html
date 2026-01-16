@@ -1,125 +1,201 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Atendimento Gás</title>
-  <style>
-    /* Tela central tipo app */
-    body {
-      margin: 0;
-      font-family: 'Arial', sans-serif;
-      background: #f0f0f0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Império Gás - Atendimento</title>
+<style>
+/* === Tela tipo celular === */
+body {
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+  background: #f0f0f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
 
-    .app-container {
-      width: 360px; /* largura de um celular */
-      height: 640px; /* altura de um celular */
-      background: #fff;
-      border-radius: 20px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
+.app-container {
+  width: 360px;
+  height: 640px;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
 
-    header {
-      background: #0066ff;
-      color: white;
-      padding: 15px;
-      text-align: center;
-      font-size: 1.2em;
-      font-weight: bold;
-    }
+header {
+  background: #0066ff;
+  color: white;
+  padding: 15px;
+  text-align: center;
+  font-size: 1.2em;
+  font-weight: bold;
+}
 
-    .chat {
-      flex: 1;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      overflow-y: auto;
-      gap: 10px;
-    }
+/* === Chat === */
+.chat {
+  flex: 1;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  gap: 10px;
+}
 
-    .message {
-      padding: 10px;
-      border-radius: 10px;
-      max-width: 70%;
-    }
+.message {
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 70%;
+}
 
-    .message.client {
-      background: #0066ff;
-      color: white;
-      align-self: flex-end;
-    }
+.message.client {
+  background: #0066ff;
+  color: white;
+  align-self: flex-end;
+}
 
-    .message.bot {
-      background: #e0e0e0;
-      color: black;
-      align-self: flex-start;
-    }
+.message.bot {
+  background: #e0e0e0;
+  color: black;
+  align-self: flex-start;
+}
 
-    .input-area {
-      display: flex;
-      border-top: 1px solid #ccc;
-    }
+/* === Input === */
+.input-area {
+  display: flex;
+  border-top: 1px solid #ccc;
+}
 
-    .input-area input {
-      flex: 1;
-      padding: 10px;
-      border: none;
-      outline: none;
-      font-size: 1em;
-    }
+.input-area input {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  outline: none;
+  font-size: 1em;
+}
 
-    .input-area button {
-      background: #0066ff;
-      color: white;
-      border: none;
-      padding: 0 15px;
-      cursor: pointer;
-      font-size: 1em;
-    }
-  </style>
+.input-area button {
+  background: #0066ff;
+  color: white;
+  border: none;
+  padding: 0 15px;
+  cursor: pointer;
+  font-size: 1em;
+}
+
+/* === Painel de Funcionário === */
+#painel-func {
+  display: none;
+  flex-direction: column;
+  padding: 10px;
+  background: #f9f9f9;
+  height: 100%;
+  overflow-y: auto;
+}
+
+#painel-func h2 {
+  text-align: center;
+  margin: 0 0 10px 0;
+}
+
+.pedido {
+  padding: 10px;
+  background: #e0e0e0;
+  border-radius: 10px;
+  margin-bottom: 5px;
+}
+</style>
 </head>
 <body>
-  <div class="app-container">
-    <header>Império Gás</header>
-    <div class="chat" id="chat">
-      <div class="message bot">Olá! Quer comprar o gás P13?</div>
-    </div>
-    <div class="input-area">
-      <input type="text" id="userInput" placeholder="Digite sua mensagem...">
-      <button onclick="sendMessage()">Enviar</button>
-    </div>
+
+<div class="app-container" id="app">
+  <header>Império Gás</header>
+
+  <!-- Chat -->
+  <div class="chat" id="chat">
+    <div class="message bot">Olá! Quer comprar o gás P13? Preço: R$120. Pagamento via Pix.</div>
   </div>
 
-  <script>
-    function sendMessage() {
-      const input = document.getElementById('userInput');
-      const chat = document.getElementById('chat');
+  <!-- Input -->
+  <div class="input-area">
+    <input type="text" id="userInput" placeholder="Digite sua mensagem...">
+    <button onclick="sendMessage()">Enviar</button>
+    <button onclick="abrirPainel()" style="background:#28a745;">Painel</button>
+  </div>
 
-      if (input.value.trim() === '') return;
+  <!-- Painel do Funcionário -->
+  <div id="painel-func">
+    <h2>Pedidos Recebidos</h2>
+    <div id="pedidos"></div>
+    <button onclick="fecharPainel()" style="margin-top:10px;background:#ff4d4d;color:white;">Fechar Painel</button>
+  </div>
+</div>
 
-      // mensagem do cliente
-      const userMsg = document.createElement('div');
-      userMsg.classList.add('message', 'client');
-      userMsg.textContent = input.value;
-      chat.appendChild(userMsg);
+<script>
+const chat = document.getElementById('chat');
+const input = document.getElementById('userInput');
+const pedidosDiv = document.getElementById('pedidos');
+const painel = document.getElementById('painel-func');
+const app = document.getElementById('app');
 
-      // resposta automática
-      const botMsg = document.createElement('div');
-      botMsg.classList.add('message', 'bot');
-      botMsg.textContent = 'Pedido recebido: ' + input.value;
-      chat.appendChild(botMsg);
+let pedidos = [];
 
-      input.value = '';
-      chat.scrollTop = chat.scrollHeight;
-    }
-  </script>
+function sendMessage() {
+  if(input.value.trim() === '') return;
+
+  // Mensagem do cliente
+  const userMsg = document.createElement('div');
+  userMsg.classList.add('message','client');
+  userMsg.textContent = input.value;
+  chat.appendChild(userMsg);
+
+  // Resposta automática
+  const botMsg = document.createElement('div');
+  botMsg.classList.add('message','bot');
+  botMsg.innerHTML = `Pedido recebido: ${input.value} <br> <button onclick="pagamentoPix('${input.value}')">Pagar Pix</button>`;
+  chat.appendChild(botMsg);
+
+  // Salva no painel
+  pedidos.push(input.value);
+  atualizarPainel();
+
+  input.value = '';
+  chat.scrollTop = chat.scrollHeight;
+}
+
+// Simula pagamento Pix
+function pagamentoPix(pedido) {
+  alert(`Link de pagamento Pix para: ${pedido} \nValor: R$120`);
+}
+
+// Atualiza o painel do funcionário
+function atualizarPainel() {
+  pedidosDiv.innerHTML = '';
+  pedidos.forEach((p, i) => {
+    const div = document.createElement('div');
+    div.classList.add('pedido');
+    div.textContent = `${i+1}. ${p}`;
+    pedidosDiv.appendChild(div);
+  });
+}
+
+// Abre painel
+function abrirPainel() {
+  chat.style.display = 'none';
+  input.parentElement.style.display = 'none';
+  painel.style.display = 'flex';
+}
+
+// Fecha painel
+function fecharPainel() {
+  chat.style.display = 'flex';
+  input.parentElement.style.display = 'flex';
+  painel.style.display = 'none';
+}
+</script>
 </body>
 </html>
