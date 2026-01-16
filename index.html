@@ -5,38 +5,51 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Império Gás - Atendimento</title>
 <style>
-/* Corpo da página */
-body {
+/* RESET */
+* {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+}
+body {
     font-family: Arial, sans-serif;
     background-color: #f0f0f0;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     height: 100vh;
+    width: 100vw;
+    padding: 10px;
 }
 
-/* Caixa de chat */
-.chat-container {
+/* CONTAINER PRINCIPAL */
+.container {
     width: 100%;
     max-width: 480px;
-    height: 90vh;
-    background: #fff;
-    border-radius: 10px;
-    padding: 10px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    height: 100%;
     display: flex;
     flex-direction: column;
 }
 
-/* Título */
-.chat-container h2 {
+/* TÍTULOS */
+h2 {
     text-align: center;
-    margin: 0 0 10px 0;
+    margin-bottom: 10px;
+    font-size: 22px;
+    color: #333;
 }
 
-/* Área de mensagens */
+/* CHAT */
+.chat-container {
+    background: #fff;
+    border-radius: 15px;
+    padding: 15px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
 .chat-messages {
     flex: 1;
     overflow-y: auto;
@@ -44,54 +57,117 @@ body {
     padding-right: 5px;
 }
 
-/* Mensagens */
 .message {
-    padding: 8px 12px;
-    border-radius: 10px;
-    margin-bottom: 5px;
+    padding: 10px 15px;
+    border-radius: 15px;
+    margin-bottom: 8px;
     max-width: 80%;
     word-wrap: break-word;
+    font-size: 18px;
 }
+.bot { background-color: #d4f7d4; align-self: flex-start; }
+.user { background-color: #cce0ff; align-self: flex-end; }
 
-/* Mensagens do bot */
-.bot {
-    background-color: #d4f7d4;
-    align-self: flex-start;
-}
-
-/* Mensagens do usuário */
-.user {
-    background-color: #cce0ff;
-    align-self: flex-end;
-}
-
-/* Input e botão */
 .chat-input {
     display: flex;
-    gap: 5px;
+    gap: 10px;
 }
-
 .chat-input input {
     flex: 1;
-    padding: 10px;
-    border-radius: 5px;
+    padding: 15px;
+    font-size: 18px;
+    border-radius: 10px;
     border: 1px solid #ccc;
 }
-
 .chat-input button {
-    padding: 10px 15px;
-    border: none;
+    padding: 15px 20px;
     background-color: #28a745;
-    color: white;
-    border-radius: 5px;
+    color: #fff;
+    font-size: 18px;
+    border: none;
+    border-radius: 10px;
     cursor: pointer;
+}
+
+/* BOTÃO DO PAINEL */
+#togglePanel {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+/* LOGIN DO PAINEL */
+.login-container {
+    background: #fff;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    display: none;
+    flex-direction: column;
+}
+.login-container input {
+    padding: 15px;
+    font-size: 18px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    margin-bottom: 15px;
+}
+.login-container button {
+    padding: 15px;
+    font-size: 18px;
+    border-radius: 10px;
+    border: none;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+}
+
+/* PAINEL FUNCIONÁRIO */
+.panel-container {
+    background: #fff;
+    border-radius: 15px;
+    padding: 15px;
+    flex: 1;
+    display: none;
+    flex-direction: column;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    overflow-y: auto;
+}
+.order {
+    border-bottom: 1px solid #ccc;
+    padding: 12px 0;
+}
+.order h3 {
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+.order p {
+    font-size: 16px;
+    margin-bottom: 3px;
 }
 </style>
 </head>
 <body>
 
-<div class="chat-container">
-    <h2>Império Gás - Atendimento Online</h2>
+<div class="container">
+
+<button id="togglePanel">Painel de Funcionários</button>
+
+<!-- Login Painel -->
+<div class="login-container" id="loginContainer">
+    <h2>Senha Funcionário</h2>
+    <input type="password" id="senha" placeholder="Digite a senha">
+    <button onclick="checkSenha()">Entrar</button>
+</div>
+
+<!-- Chat Cliente -->
+<div class="chat-container" id="chatContainer">
+    <h2>Império Gás - Atendimento</h2>
     <div class="chat-messages" id="chatMessages">
         <div class="message bot">Olá! Bem-vindo ao Império Gás. Qual é o seu nome?</div>
     </div>
@@ -101,37 +177,83 @@ body {
     </div>
 </div>
 
+<!-- Painel Funcionário -->
+<div class="panel-container" id="panelContainer">
+    <h2>Pedidos em Tempo Real</h2>
+    <div id="orders"></div>
+</div>
+
+</div>
+
 <script>
 const chatMessages = document.getElementById('chatMessages');
 const userInput = document.getElementById('userInput');
+const ordersDiv = document.getElementById('orders');
+const loginContainer = document.getElementById('loginContainer');
+const panelContainer = document.getElementById('panelContainer');
+const chatContainer = document.getElementById('chatContainer');
+const toggleBtn = document.getElementById('togglePanel');
 
+let pedidos = [];
+
+// Senha do painel
+const SENHA = "147985";
+
+// Alternar painel
+toggleBtn.addEventListener('click', () => {
+    chatContainer.style.display = "none";
+    loginContainer.style.display = "flex";
+});
+
+// Checar senha
+function checkSenha() {
+    const senhaInput = document.getElementById('senha').value;
+    if(senhaInput === SENHA) {
+        loginContainer.style.display = "none";
+        panelContainer.style.display = "flex";
+    } else {
+        alert("Senha incorreta!");
+    }
+}
+
+// Enviar mensagem cliente
 function sendMessage() {
     const text = userInput.value.trim();
-    if (!text) return;
+    if(!text) return;
 
-    // Mostra a mensagem do usuário
     const userMessage = document.createElement('div');
     userMessage.classList.add('message', 'user');
     userMessage.textContent = text;
     chatMessages.appendChild(userMessage);
-
     userInput.value = '';
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
-    // Resposta automática simples
     setTimeout(() => {
         const botMessage = document.createElement('div');
         botMessage.classList.add('message', 'bot');
-
-        if(text.toLowerCase().includes('nome')){
-            botMessage.textContent = `Prazer em te atender, ${text}! Nosso gás disponível é o P13. O pagamento é via PIX.`;
+        if(text.toLowerCase().includes('nome')) {
+            botMessage.textContent = `Prazer em te atender, ${text}! Nosso gás disponível é o P13. Pagamento via PIX. Qual o endereço para entrega?`;
         } else {
-            botMessage.textContent = "Nosso gás disponível é o P13. Pagamento somente via PIX. Qual endereço para entrega?";
+            botMessage.textContent = "Pedido registrado! Nosso entregador está a caminho.";
+            pedidos.push({cliente: "Cliente", endereco: text, produto: "Gás P13"});
+            atualizarPainel();
         }
-
         chatMessages.appendChild(botMessage);
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }, 800);
+}
+
+// Atualizar painel
+function atualizarPainel() {
+    ordersDiv.innerHTML = '';
+    pedidos.forEach((pedido, i) => {
+        const div = document.createElement('div');
+        div.classList.add('order');
+        div.innerHTML = `<h3>Pedido #${i+1}</h3>
+                         <p>Produto: ${pedido.produto}</p>
+                         <p>Endereço: ${pedido.endereco}</p>`;
+        ordersDiv.appendChild(div);
+    });
 }
 </script>
 
